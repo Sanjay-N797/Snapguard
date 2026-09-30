@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SnapGuard — Private AI Protection for Your PC</title>
+    <meta name="description" content="Local, privacy-focused AI application for detecting and redacting sensitive data directly on your PC.">
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header class="navbar">
+        <div class="brand">
+            <span class="brand-icon">🔐</span>
+            <div class="brand-text">
+                <h1>SNAPGUARD</h1>
+                <p>Private AI Protection</p>
+            </div>
+        </div>
+
+        <nav class="nav-links">
+            <button class="nav-btn active" onclick="showTab('dashboard')">🏠 Dashboard</button>
+            <button class="nav-btn" onclick="showTab('scan')">📄 Scan File / Camera</button>
+            <button class="nav-btn" onclick="showTab('results')">🛡️ Results</button>
+            <button class="nav-btn" onclick="showTab('history')">📜 History</button>
+            <button class="nav-btn" onclick="showTab('privacy')">🔒 Privacy Center</button>
+            <button class="nav-btn" onclick="showTab('settings')">⚙️ Settings</button>
+        </nav>
+
+        <div class="status-badge">
+            <span class="status-dot"></span>
+            <span id="aiStatusLabel">ON-DEVICE LOCAL AI</span>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="container">
+
+        <!-- DASHBOARD TAB -->
+        <section id="tab-dashboard" class="tab-content">
+            <div class="glass-card" style="text-align: center; border: 2px dashed #a5b4fc; padding: 40px 20px; background: #ffffff;">
+                <div style="font-size: 50px; margin-bottom: 12px;">🛡️</div>
+                <h2 style="font-size: 24px; color: var(--text-main); margin-bottom: 8px;">PROTECT YOUR DATA</h2>
+                <p style="color: var(--text-muted); font-size: 15px; max-width: 600px; margin: 0 auto 24px;">
+                    Scan PDFs, images, code files, or camera captures for sensitive data. 100% on-device local AI protection.
+                </p>
+                <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+                    <button class="btn-primary" onclick="showTab('scan')">📄 START NEW SCAN</button>
+                    <button class="btn-secondary" onclick="switchScanMode('camera'); showTab('scan');">📷 LIVE CAMERA SCAN</button>
+                    <button class="btn-secondary" onclick="runDemo('sample_confidential_document.pdf')">⚡ DEMO PDF SAMPLE</button>
+                </div>
+            </div>
+
+            <!-- Metrics Row -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-val" id="metricScansToday">0</div>
+                    <div class="metric-lbl">Scans Today</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-val" id="metricRisksFound" style="color: var(--color-critical);">0</div>
+                    <div class="metric-lbl">Risks Found</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-val" id="metricFilesProtected" style="color: var(--color-safe);">0</div>
+                    <div class="metric-lbl">Files Protected</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-val" id="metricTotalScans" style="color: #6366f1;">0</div>
+                    <div class="metric-lbl">Total Scans</div>
+                </div>
+            </div>
+
+            <!-- Hardware & Snapdragon AI Panel -->
+            <div class="glass-card">
+                <h3 style="color: var(--accent-primary); font-size: 18px; margin-bottom: 16px;">⚡ DEVICE AI & HARDWARE ACCELERATION</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+                    <div>
+                        <p style="color: var(--text-muted); font-size: 13px;">Processor:</p>
+                        <p id="hwProcessor" style="font-weight: 600;">Detecting...</p>
+                        <p style="color: var(--text-muted); font-size: 13px; margin-top: 10px;">Inference Mode:</p>
+                        <p id="hwInference" style="font-weight: 600;">Local (On-Device)</p>
+                    </div>
+                    <div>
+                        <p style="color: var(--text-muted); font-size: 13px;">Acceleration Status:</p>
+                        <p id="hwAcceleration" style="font-weight: 600; color: var(--color-safe);">Detecting...</p>
+                        <p style="color: var(--text-muted); font-size: 13px; margin-top: 10px;">Qualcomm AI Hub Backend:</p>
+                        <p id="hwHubReady" style="font-weight: 600;">🟢 Active & Compatible</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SCAN FILE TAB -->
+        <section id="tab-scan" class="tab-content" style="display: none;">
+            <!-- Scan Mode Switcher -->
+            <div style="margin-bottom: 20px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <button id="btnModeUpload" class="btn-primary" onclick="switchScanMode('upload')">📄 Upload File</button>
+                <button id="btnModeCamera" class="btn-secondary" onclick="switchScanMode('camera')">📷 Live Camera Scan</button>
+                <button id="btnModeDemo" class="btn-secondary" onclick="switchScanMode('demo')">⚡ Instant Demo Samples</button>
+            </div>
+
+            <!-- 1. FILE UPLOAD MODE -->
+            <div id="scanModeUpload" class="glass-card">
+                <h2 style="color: var(--accent-primary); margin-bottom: 10px;">📄 SCAN LOCAL FILE</h2>
+                <p style="color: var(--text-muted); margin-bottom: 24px;">Drop a file or browse from disk to analyze sensitive data locally.</p>
+
+                <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()">
+                    <div class="dropzone-icon">📁</div>
+                    <h3 style="font-size: 18px; margin-bottom: 6px; color: var(--text-main);">Drop your file here or click to browse</h3>
+                    <p style="color: var(--text-muted); font-size: 13px;">Supported: PDF, PNG, JPG, WEBP, TXT, DOCX</p>
+                    <input type="file" id="fileInput" style="display: none;" onchange="handleFileSelect(event)">
+                </div>
+
+                <div style="margin-top: 20px; display: flex; gap: 12px; align-items: center; justify-content: space-between;">
+                    <div id="selectedFileInfo" style="color: var(--accent-primary); font-weight: 600;">No file selected</div>
+                    <button class="btn-primary" id="btnStartScan" onclick="uploadAndScan()" disabled>🔍 START PRIVACY ANALYSIS</button>
+                </div>
+            </div>
+
+            <!-- 2. LIVE CAMERA SCAN MODE -->
+            <div id="scanModeCamera" class="glass-card" style="display: none;">
+                <h2 style="color: var(--accent-primary); margin-bottom: 10px;">📷 CAMERA SCANNER</h2>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Use live webcam stream or click "Snap Photo with Native Camera" to take a snapshot for AI scan.</p>
+
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <video id="webcamVideo" style="width: 100%; max-width: 600px; height: 350px; background: #000; border-radius: 12px; border: 2px solid var(--accent-primary); display: none;" autoplay playsinline></video>
+                    <img id="cameraSnapshotPreview" style="width: 100%; max-width: 600px; border-radius: 12px; border: 2px solid var(--color-safe); display: none;" alt="Camera Snapshot">
+                    <canvas id="webcamCanvas" style="display: none;"></canvas>
+
+                    <div id="cameraStatusMsg" style="margin-top: 10px; color: var(--text-muted); font-size: 14px;">Camera is currently idle.</div>
+                </div>
+
+                <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+                    <button class="btn-primary" id="btnStartCamera" onclick="startWebcam()">📷 OPEN WEBCAM STREAM</button>
+                    <button class="btn-primary" id="btnCapturePhoto" onclick="captureWebcamFrame()" style="display: none; background: linear-gradient(135deg, #10b981, #059669);">📸 CAPTURE & SCAN PHOTO</button>
+                    <button class="btn-secondary" id="btnResetCamera" onclick="resetWebcam()" style="display: none;">🔄 RESET CAMERA</button>
+                    
+                    <button class="btn-secondary" onclick="document.getElementById('cameraFileInput').click()" style="background: rgba(79, 70, 229, 0.1);">📸 SNAP / UPLOAD CAMERA PHOTO</button>
+                    <input type="file" id="cameraFileInput" accept="image/*" capture="environment" style="display: none;" onchange="handleCameraFileSelect(event)">
+                </div>
+            </div>
+
+            <!-- 3. INSTANT DEMO MODE -->
+            <div id="scanModeDemo" class="glass-card" style="display: none;">
+                <h3 style="font-size: 16px; margin-bottom: 12px;">⚡ Select Competition Demo Sample</h3>
+                <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                    <button class="btn-secondary" onclick="runDemo('sample_confidential_document.pdf')">📄 Sample Confidential PDF</button>
+                    <button class="btn-secondary" onclick="runDemo('sample_id_card.png')">🖼 Sample Employee ID Card</button>
+                    <button class="btn-secondary" onclick="runDemo('sample_credentials.txt')">📝 Sample Credentials TXT</button>
+                </div>
+            </div>
+
+            <!-- Live Progress Pipeline Overlay -->
+            <div id="scanProgressCard" class="glass-card" style="display: none;">
+                <h3 style="color: var(--accent-primary); margin-bottom: 16px;">🔄 AI SCAN PIPELINE RUNNING</h3>
+                <div class="progress-step" id="step1">
+                    <span>1️⃣</span>
+                    <span>PaddleOCR & Document Text Extraction</span>
+                </div>
+                <div class="progress-step" id="step2">
+                    <span>2️⃣</span>
+                    <span>Deterministic Rule Engine & Regex Matcher</span>
+                </div>
+                <div class="progress-step" id="step3">
+                    <span>3️⃣</span>
+                    <span>Contextual NER Classifier Evaluation</span>
+                </div>
+                <div class="progress-step" id="step4">
+                    <span>4️⃣</span>
+                    <span>Dynamic Security Score & Risk Assessment</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- RESULTS TAB -->
+        <section id="tab-results" class="tab-content" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
+                <div>
+                    <h2 style="color: var(--accent-primary);" id="resFileName">🛡️ SECURITY ANALYSIS</h2>
+                    <p style="color: var(--text-muted);" id="resMeta">Processing time: -- sec | Items found: --</p>
+                </div>
+                <div class="score-box" id="resScoreBox">
+                    <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; letter-spacing: 0.5px;">SECURITY SCORE</div>
+                    <div class="score-num" id="resScoreNum">--</div>
+                    <div class="badge badge-critical" id="resRiskBadge">CRITICAL</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons Bar -->
+            <div class="glass-card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+                <div style="font-size: 14px; color: var(--text-muted);" id="resSummary">Risk summary analyzing...</div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-primary" onclick="executeRedaction()">████ REDACT ALL SENSITIVE ITEMS</button>
+                    <a id="btnDownload" href="#" download style="display: none; background: linear-gradient(135deg, #10b981, #059669);" class="btn-primary">⬇️ DOWNLOAD PROTECTED FILE</a>
+                </div>
+            </div>
+
+            <!-- Filter Pills -->
+            <div style="margin-bottom: 16px; display: flex; gap: 10px; align-items: center;">
+                <span style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Filter Severity:</span>
+                <button class="btn-secondary" onclick="filterFindings('ALL')">All</button>
+                <button class="btn-secondary" onclick="filterFindings('CRITICAL')">🔴 Critical</button>
+                <button class="btn-secondary" onclick="filterFindings('HIGH')">🟠 High</button>
+                <button class="btn-secondary" onclick="filterFindings('MEDIUM')">🟡 Medium</button>
+            </div>
+
+            <!-- OCR Text Display -->
+            <div class="glass-card">
+                <h3 style="color: var(--accent-primary); margin-bottom: 12px;">📝 EXTRACTED OCR TEXT</h3>
+                <div class="code-view" id="ocrTextView" style="max-height: 200px; overflow-y: auto;">No OCR text available.</div>
+            </div>
+
+            <!-- Findings List -->
+            <div id="findingsContainer">
+                <div class="glass-card">No active scan findings to display.</div>
+            </div>
+
+            <!-- Visual Document Preview -->
+            <div class="glass-card">
+                <h3 style="color: var(--accent-primary); margin-bottom: 16px;">🖼 DOCUMENT PREVIEW & BOUNDING BOX OVERLAYS</h3>
+                <div id="previewImageWrapper" style="text-align: center;">
+                    <img id="previewImage" src="" alt="Preview Bounding Boxes" style="max-width: 100%; border-radius: 12px; border: 1px solid var(--card-border); display: none;">
+                    <p id="noImageText" style="color: var(--text-muted);">Text content document rendered in Before/After view below.</p>
+                </div>
+            </div>
+
+            <!-- BEFORE / AFTER VIEW -->
+            <div class="glass-card">
+                <h3 style="color: var(--accent-primary); margin-bottom: 16px;">🔄 BEFORE / AFTER REDACTION COMPARISON</h3>
+                <div class="before-after-grid">
+                    <div>
+                        <h4 style="margin-bottom: 10px; color: var(--color-critical);">BEFORE (Original Unredacted Secrets)</h4>
+                        <div class="code-view" id="codeBefore">No content loaded.</div>
+                    </div>
+                    <div>
+                        <h4 style="margin-bottom: 10px; color: var(--color-safe);">AFTER (Protected Redacted Copy)</h4>
+                        <div class="code-view" id="codeAfter" style="color: var(--color-safe);">No content loaded.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HISTORY TAB -->
+        <section id="tab-history" class="tab-content" style="display: none;">
+            <div class="glass-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                        <h2 style="color: var(--accent-primary);">📜 LOCAL SCAN HISTORY</h2>
+                        <p style="color: var(--text-muted);">Historical scan metadata logged on your PC.</p>
+                    </div>
+                    <button class="btn-secondary" onclick="clearHistory()">🗑️ DELETE HISTORY</button>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Timestamp</th>
+                            <th>Filename</th>
+                            <th>Type</th>
+                            <th>Risk Level</th>
+                            <th>Score</th>
+                            <th>Findings</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr><td colspan="8" style="text-align: center; color: var(--text-muted);">Loading history...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- PRIVACY CENTER TAB -->
+        <section id="tab-privacy" class="tab-content" style="display: none;">
+            <div class="glass-card">
+                <h2 style="color: var(--accent-primary); margin-bottom: 10px;">🔒 PRIVACY CENTER</h2>
+                <p style="color: var(--text-muted); margin-bottom: 24px;">Transparent controls and on-device execution guarantees.</p>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--card-border);">
+                        <p style="margin-bottom: 8px;"><strong>Local Processing:</strong> 🟢 ON (Enabled)</p>
+                        <p style="margin-bottom: 8px;"><strong>Cloud Processing:</strong> 🔴 OFF (Disabled)</p>
+                        <p style="margin-bottom: 8px;"><strong>Files Uploaded Externally:</strong> NO (100% On-Device)</p>
+                    </div>
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--card-border);">
+                        <p style="margin-bottom: 8px;"><strong>Stored File Contents:</strong> NO (Metadata only)</p>
+                        <p style="margin-bottom: 8px;"><strong>Network Telemetry:</strong> DISABLED</p>
+                        <p style="margin-bottom: 8px;"><strong>Snapdragon NPU Ready:</strong> YES</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SETTINGS TAB -->
+        <section id="tab-settings" class="tab-content" style="display: none;">
+            <div class="glass-card">
+                <h2 style="color: var(--accent-primary); margin-bottom: 10px;">⚙️ SETTINGS</h2>
+                <p style="color: var(--text-muted); margin-bottom: 20px;">Configure AI detection rules and local preferences.</p>
+
+                <div style="max-width: 600px;">
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; font-weight: 600; margin-bottom: 6px;">AI Detection Model:</label>
+                        <select style="width: 100%; padding: 10px; background: #ffffff; border: 1px solid var(--card-border); color: var(--text-main); border-radius: 8px;">
+                            <option>PaddleOCR + BERT NER + Rule Engine (Recommended)</option>
+                            <option>Deterministic Regex Only (Fast)</option>
+                            <option>Qualcomm AI Hub Backend (Auto-Detect)</option>
+                        </select>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 13px;">SnapGuard Version 1.0.0 — Designed for Snapdragon HP PCs</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>🔐 SnapGuard — Private AI Protection for Your PC • 100% Local On-Device AI</p>
+    </footer>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

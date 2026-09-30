@@ -1,0 +1,58 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Environment variables & secrets
+.env
+.env.*
+*.env
+secrets/
+secrets.toml
+.streamlit/secrets.toml
+*.pem
+*.key
+*.crt
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+database/*.db
+
+# Generated outputs
+outputs/*
+!outputs/.gitkeep
+
+# Model weights & binary model files
+*.pth
+*.pt
+*.onnx
+*.bin
+*.h5
+*.safetensors
+*.tflite
+*.ckpt
+*.pb
+*.pkl
+*.joblib
+models/*.pth
+models/*.pt
+models/*.onnx
+models/*.bin
+models/*.h5
+models/*.safetensors
+models/*.pkl
+
+# Streamlit / IDE / OS files
+.streamlit/
+.DS_Store
+.vscode/
+.idea/
+*.swp
